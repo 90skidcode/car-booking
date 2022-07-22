@@ -4,7 +4,6 @@ import AboutUs from "./aboutus";
 import Booking from "./booking";
 import Cars from "./cars";
 import Login from "./login";
-
 export const Context = createContext();
 
 function App() {
@@ -16,7 +15,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/aboutus" element={<AboutUs/>}/>
         <Route path="/booking" element={<Booking/>}/>
-        <Route path="*" exact element={<Login />} />
+        <Route path="*" exact element={<Cars />} />
       </Routes>
     </>
   );
