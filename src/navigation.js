@@ -31,7 +31,7 @@ function BottomNavigation(params) {
                 </svg>
                 <span className="tab tab-kategori block text-xs">My Booking</span>
             </div>
-            <div onClick={() => navigate('/aboutus')} className={`w-full justify-center inline-block text-center pt-2 pb-1  ${location.pathname === '/aboutus' ? 'bg-blue-900' : ''} `}>
+            <div onClick={() => navigate('/profile')} className={`w-full justify-center inline-block text-center pt-2 pb-1  ${location.pathname === '/aboutus' ? 'bg-blue-900' : ''} `}>
                 <svg width="25" height="25" viewBox="0 0 42 42" className="inline-block mb-1">
                     <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                         <path d="M20.5890101,0.254646884 C12.8696785,5.50211755 8.0025785,14.258415 14.1941217,18.8708225 C23.16683,25.5550669 13.3362326,40.2698884 33.1021758,38.4149164 C29.6814884,40.8311956 25.5065164,42.2507054 21,42.2507054 C9.40202025,42.2507054 0,32.8486852 0,21.2507054 C0,9.79003409 9.18071714,0.473634138 20.5890101,0.254646884 Z" fill="currentColor" opacity="0.1"></path>
@@ -39,7 +39,7 @@ function BottomNavigation(params) {
                         <circle stroke="currentColor" strokeWidth="2" cx="21" cy="21" r="20"></circle>
                     </g>
                 </svg>
-                <span className="tab tab-explore block text-xs">About Us</span>
+                <span className="tab tab-explore block text-xs">My Account</span>
             </div>
         </div>
     </section>

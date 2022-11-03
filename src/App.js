@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 import { Routes, Route } from "react-router-dom";
-import AboutUs from "./aboutus";
+import MyAccount from "./myaccount";
 import Booking from "./booking";
 import Cars from "./cars";
 import Login from "./login";
@@ -13,9 +13,9 @@ function App() {
         <Route path="/" exact element={<Login />} />
         <Route path="/cars" element={<Cars />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/aboutus" element={<AboutUs/>}/>
+        <Route path="/profile" element={<MyAccount/>}/>
         <Route path="/booking" element={<Booking/>}/>
-        <Route path="*" exact element={<Cars />} />
+        <Route path="*" exact element={<Login />} />
       </Routes>
     </>
   );
