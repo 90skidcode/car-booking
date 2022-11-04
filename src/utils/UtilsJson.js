@@ -1,5 +1,5 @@
 export const UtilsJson = {
-  baseUrl: "https://thecoderspace.com/codedev/automobile/api/",
-  serverUrl : "https://thecoderspace.com/codedev/automobile/api/",
+  baseUrl: "https://www.thecoderspace.com/codedev/automobile/api/",
+  serverUrl : "https://www.thecoderspace.com/codedev/automobile/api/",
   routingUrl: ''
 };

@@ -17,7 +17,7 @@ function Cars() {
     "auto_start_date": "",
     "auto_end_date": "",
     "auto_customer_code": JSON.parse(sessionStorage.getItem('user'))[0].id,
-    "auto_product_code":""
+    "auto_product_code": ""
   };
 
   const [formValues, setFormValues] = useState(intilizeValue);
@@ -28,25 +28,26 @@ function Cars() {
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const error = '';
+
 
   const saveBooking = () => {
-    formValues['auto_product_code']= selectedCar.id;
-    if (formValues['auto_customer_book_name'] && formValues['auto_customer_book_number'] && formValues['auto_start_date'] && formValues['auto_end_date']) {
+    formValues['auto_product_code'] = selectedCar.id;
+    if (formValues['auto_customer_book_name'] && formValues['auto_customer_book_number'].length === 10 && formValues['auto_start_date'] && formValues['auto_end_date']) {
       let bookingData = { "list_key": "AddMaster", "label": "auto_booking", "tablefields": formValues };
       PostApi('services.php', bookingData).then((e) => {
         setModal(false);
         toast.success('Booked successfully');
+        setFormValues(intilizeValue);
       })
-    }else
-    toast.error('Please fill all the details');
+    } else
+      toast.error('Please fill all the details');
   }
   useEffect(() => {
     PostApi('services.php', tableData).then((e) => { setcarsList(e.responcePostData.data.result) })
   }, []);
 
   return (
-    <div className='bg-slate-200 h-full'>
+    <div className='bg-slate-200 h-screen'>
       <TopBar />
       <ToastContainer position='top-right z-[999]' />
       <div className="mx-2 pb-[70px] pt-12">
@@ -127,15 +128,15 @@ function Cars() {
                       <label className='text-left'>From Date</label>
                       <input type="date" name="auto_start_date" min={new Date().toISOString().split('T')[0]} onChange={(e) => handlechange(e)} className="mt-1 mb-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
                       <label className='text-left'>To Date</label>
-                      <input type="date" name="auto_end_date" min={formValues.auto_start_date ? new Date(formValues.auto_start_date).toISOString().split('T')[0]: ''} onChange={(e) => handlechange(e)} className="mt-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
-                      {error ? <p className="text-sm text-red-500">Please fill all the fields </p> : ''}
+                      <input type="date" name="auto_end_date" min={formValues.auto_start_date ? new Date(formValues.auto_start_date).toISOString().split('T')[0] : ''} onChange={(e) => handlechange(e)} className="mt-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
+                      {/* {error ? <p className="text-sm text-red-500">Please fill all the fields </p> : ''} */}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button" onClick={() => saveBooking()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:blue-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">Book Now</button>
-                <button type="button" onClick={() => setModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border-2 border-red-600 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                <button type="button" onClick={() => { setModal(false); setFormValues(intilizeValue) }} className="mt-3 w-full inline-flex justify-center rounded-md border-2 border-red-600 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
               </div>
             </div>
           </div>

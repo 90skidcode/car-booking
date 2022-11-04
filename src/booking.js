@@ -17,9 +17,8 @@ import 'filepond/dist/filepond.min.css'
 // `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation --save`
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginFileRename from 'filepond-plugin-file-rename';
-
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileRename)
 
@@ -30,7 +29,7 @@ function Booking() {
   const [selectedCarImage, setselectedCarImage] = useState([]);
   const [carsList, setcarsList] = useState([]);
   const [bookingList, setBookingList] = useState([]);
-  const [files, setFiles] = useState([])
+  var files = [];
   const [filesDetails, setFilesDetails] = useState([])
   let productData = { "list_key": "Mastertable", "label": "auto_product", "select": "*", "condition": { "status": 1 } }
   let bookingData = { "list_key": "Mastertable", "label": "auto_booking", "select": "*", "condition": { "auto_customer_code": JSON.parse(sessionStorage.getItem('user'))[0].id } }
@@ -46,10 +45,9 @@ function Booking() {
     } catch (error) {
       return '';
     }
-
   }
 
-  const startRide = (id) => {
+  const startRide = () => {
     let rideData = {
       "list_key": "AddMaster", "label": "auto_ride", "tablefields": {
         'auto_booking_id': selectedCar.id,
@@ -73,10 +71,10 @@ function Booking() {
     });
   }
 
-  const cancelBooking = () => {
+  const cancelBooking = (item) => {
     let customerList = {
       "list_key": "UpdateMaster", "label": "auto_booking", "update_coloum": { 'status': 2 },
-      "condition": { "id": selectedCar.id }
+      "condition": { "id": item.id }
     }
 
     PostApi('services.php', customerList).then((e) => {
@@ -93,7 +91,7 @@ function Booking() {
   }
 
   return (
-    <div className='bg-slate-200 h-full'>
+    <div className='bg-slate-200 h-screen'>
       <TopBar />
       <ToastContainer position='top-right z-[999]' />
       <div className="mx-2 pb-[70px] pt-12">
@@ -130,7 +128,7 @@ function Booking() {
                   <button onClick={() => { setModal(true); setselectedCar(item); }} type="button" className="px-6 mb-2 mr-2 py-2.5 border-2 border-blue-600 bg-blue-600 text-white font-medium text-xs leading-tight uppercase shadow-md    focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out rounded-sm">
                     Ride Now
                   </button>
-                  <button onClick={() => { setselectedCar(item); cancelBooking(); }} type="button" className="px-6 mb-2 py-2.5 border-2 border-red-600 bg-white text-black font-medium text-xs leading-tight uppercase shadow-md    focus:outline-none focus:ring-0 transition  duration-150  ease-in-out rounded-sm">
+                  <button onClick={() => { cancelBooking(item); }} type="button" className="px-6 mb-2 py-2.5 border-2 border-red-600 bg-white text-black font-medium text-xs leading-tight uppercase shadow-md    focus:outline-none focus:ring-0 transition  duration-150  ease-in-out rounded-sm">
                     Cancel Booking
                   </button>
                 </>
@@ -162,23 +160,23 @@ function Booking() {
                     <div className="mt-2">
                       <FilePond
                         id="files"
-                        fileRenameFunction={(file) => { return `${new Date().getTime()}${file.extension}` }}
+                        fileRenameFunction={(file) => { return `${new Date().getTime()}${Math.floor(Math.random() * 1000000000)}${file.extension}` }}
                         value={filesDetails}
-                        allowMultiple={false}
+                        allowMultiple={true}
                         maxFiles={10}
                         onupdatefiles={setFilesDetails}
                         server={{
                           'url': 'https://thecoderspace.com/codedev/automobile/api/upload.php',
                           process: {
                             onload: (response) => {
-                              setFiles([...files, JSON.parse(response).result]);
+                              files = ([...files, JSON.parse(response).result]);
                             }
                           }
                         }}
                         name="file" /* sets the file input name, it's filepond by default */
-                        labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
+                        
                         onremovefile={(error, file) => {
-                          setFiles(files.filter(item => item !== file.filename))
+                          files = (files.filter(item => item !== file.filename));
                         }}
                       /> </div>
                   </div>
@@ -188,9 +186,9 @@ function Booking() {
                 <button type="button" onClick={() => startRide()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Start Ride</button>
                 <button type="button" onClick={() => {
                   setModal(false);
-                  setFiles([]);
+                  files = [];
                   setFilesDetails([]);
-                  window.location.reload(false);
+                  window.location.reload(true);
                 }} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                   Cancel</button>
               </div>
@@ -211,7 +209,7 @@ function Booking() {
                     {
                       // eslint-disable-next-line jsx-a11y/alt-text
                       (selectedCarImage)[0]?.auto_start_ride_images ?
-                        (selectedCarImage)[0]?.auto_start_ride_images.split(',').map(i => i ? <img alt={i} className='text-center m-2' src={`${UtilsJson.baseUrl}image/${i}`} />
+                        (selectedCarImage)[0]?.auto_start_ride_images.split(',').map(i => i ? <img key={i} alt={i} className='text-center m-2' src={`${UtilsJson.baseUrl}image/${i}`} />
                           : '') : ''
                     }
                   </div>

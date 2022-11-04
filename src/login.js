@@ -98,8 +98,8 @@ function Login() {
                 <div className="items-center text-black dark:text-gray-200 px-5">
                     <h1 className="text-md text-black">Mobile Number</h1>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                        <span className="inline-flex items-center px-3  border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"> +91 </span>
-                        <input type="number" name='mobilenumber' onChange={(e) => setPhoneNumber(e.target.value)} onWheel={(e) => e.target.blur()} className="flex-1 block w-full sm:text-sm border-gray-300 " placeholder='9876543210' />
+                        <span className="inline-flex items-center px-3  border border-r-0 text-black border-gray-300 bg-gray-50 text-gray-500 text-sm"> +91 </span>
+                        <input type="number" name='mobilenumber' onChange={(e) => setPhoneNumber(e.target.value)} onWheel={(e) => e.target.blur()} className="flex-1 block w-full sm:text-sm text-black border-gray-300 " placeholder='9876543210' />
                     </div>
                     <button type="button" disabled={loader} onClick={(e) => { requestOtp() }} className="p-4 my-2 w-full bg-blue-600  text-white  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-blue-700 hover:shadow-lg  focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out">
                         Request OTP
@@ -109,9 +109,9 @@ function Login() {
                 <div className="items-center text-black dark:text-gray-200 px-5">
                     <h1 className="text-md text-black">OTP</h1>
                     <input type="number" name="otp" onChange={(e) => setOtp(e.target.value)} onWheel={(e) => e.target.blur()} className="mt-1 h-12 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
-                    <p className='text-xs text-center mt-2'>Dont receivethe OTP? <b onClick={() => requestOtp()}> RESEND OTP</b> </p>
+                    <p className='text-xs text-black text-center mt-2'>Dont receivethe OTP? <b onClick={() => requestOtp()}> RESEND OTP</b> </p>
                     <div className='flex flex-row justify-between items-start gap-2'>
-                        <button type="button" onClick={() => setstatus(false)} className="p-4 my-2 w-full border border-red-600  text-red  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-red-700 hover:shadow-lg  focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-red-800 active:shadow-lg  transition  duration-150  ease-in-out">
+                        <button type="button" onClick={() => setstatus(false)} className="p-4 my-2 w-full text-black border border-red-600  text-red  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-red-700 hover:shadow-lg  focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-red-800 active:shadow-lg  transition  duration-150  ease-in-out">
                             Cancel
                         </button>
                         <button type="button" onClick={() => verifyOTP()} className="p-4 my-2 w-full border  bg-blue-600  text-white  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-blue-700 hover:shadow-lg  focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out">
