@@ -67,8 +67,7 @@ function Login() {
 
     const verifyOTP = () => {
         otp.length === 6 ?
-            window.confirmationResult.confirm(otp).then((result) => {
-                const user = result.user;
+            window.confirmationResult.confirm(otp).then((result) => {               
                 sessionStorage.setItem('login', true);
                 let tableData = { "list_key": "Mastertable", "label": "auto_customer", "select": "*", "condition": { "status": 1, "auto_customer_phone": phoneNumber } }
                 PostApi('services.php', tableData).then((e) => {                  

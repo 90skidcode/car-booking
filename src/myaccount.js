@@ -13,6 +13,7 @@ function MyAccount() {
     }
 
     const [formValues, setFormValues] = useState({});
+    
     let customerList = {
         "list_key": "Mastertable", "label": "auto_customer", "select": "*",
         "condition": { "status": 1, "auto_customer_code": JSON.parse(sessionStorage.getItem('user'))[0].auto_customer_code }

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toast';
 import BottomNavigation from './navigation';
 import PostApi from './Services/PostApi';
 import TopBar from './topBar';
@@ -15,7 +16,8 @@ function Cars() {
     "auto_customer_book_number": "",
     "auto_start_date": "",
     "auto_end_date": "",
-    "auto_customer_code": "CUST2"
+    "auto_customer_code": JSON.parse(sessionStorage.getItem('user'))[0].id,
+    "auto_product_code":""
   };
 
   const [formValues, setFormValues] = useState(intilizeValue);
@@ -28,20 +30,25 @@ function Cars() {
 
   const error = '';
 
-  const saveBooking = () =>{
-    let bookingData = { "list_key": "AddMaster", "label": "auto_customer", "tablefields": { formValues } };
-    PostApi('services.php', bookingData).then((e) => { 
-      setModal(true);
-       
-     })
+  const saveBooking = () => {
+    formValues['auto_product_code']= selectedCar.id;
+    if (formValues['auto_customer_book_name'] && formValues['auto_customer_book_number'] && formValues['auto_start_date'] && formValues['auto_end_date']) {
+      let bookingData = { "list_key": "AddMaster", "label": "auto_booking", "tablefields": formValues };
+      PostApi('services.php', bookingData).then((e) => {
+        setModal(false);
+        toast.success('Booked successfully');
+      })
+    }else
+    toast.error('Please fill all the details');
   }
   useEffect(() => {
-    PostApi('services.php', tableData).then((e) => { console.log(e); setcarsList(e.responcePostData.data.result) })
+    PostApi('services.php', tableData).then((e) => { setcarsList(e.responcePostData.data.result) })
   }, []);
 
   return (
     <div className='bg-slate-200 h-full'>
       <TopBar />
+      <ToastContainer position='top-right z-[999]' />
       <div className="mx-2 pb-[70px] pt-12">
         {
           carsList.map((item, i) => (<div key={i} className="w-full my-2 overflow-hidden bg-white rounded-lg shadow-lg ">
@@ -58,7 +65,7 @@ function Cars() {
                 {item.auto_product_seat} Seats </div>
             </div>
             <div className="text-center">
-              <button onClick={() => { saveBooking(); }} type="button" className="px-6 mb-2 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase shadow-md    focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out rounded-sm">
+              <button onClick={() => { setModal(true); setselectedCar(item) }} type="button" className="px-6 mb-2 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase shadow-md    focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out rounded-sm">
                 Book Now
               </button>
             </div>
@@ -118,16 +125,16 @@ function Cars() {
                       <label className='text-left'>Phone Number</label>
                       <input type="number" name="auto_customer_book_number" onChange={(e) => handlechange(e)} className="mt-1 mb-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
                       <label className='text-left'>From Date</label>
-                      <input type="date" name="auto_start_date" onChange={(e) => handlechange(e)} className="mt-1 mb-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
+                      <input type="date" name="auto_start_date" min={new Date().toISOString().split('T')[0]} onChange={(e) => handlechange(e)} className="mt-1 mb-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
                       <label className='text-left'>To Date</label>
-                      <input type="date" name="auto_end_date" onChange={(e) => handlechange(e)} className="mt-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
+                      <input type="date" name="auto_end_date" min={formValues.auto_start_date ? new Date(formValues.auto_start_date).toISOString().split('T')[0]: ''} onChange={(e) => handlechange(e)} className="mt-1 h-8 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
                       {error ? <p className="text-sm text-red-500">Please fill all the fields </p> : ''}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Book Now</button>
+                <button type="button" onClick={() => saveBooking()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:blue-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">Book Now</button>
                 <button type="button" onClick={() => setModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border-2 border-red-600 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
               </div>
             </div>

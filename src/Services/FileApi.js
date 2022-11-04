@@ -12,7 +12,9 @@ async function FileApi(data) {
   };
   const formData = new FormData();
   formData.append("file", data);
-
+console.log('====================data================');
+console.log(data);
+console.log('====================================');
   await axios
     .post(UtilsJson.baseUrl + "upload.php", formData, config)
     .then((response) => {
