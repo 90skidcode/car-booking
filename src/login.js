@@ -4,13 +4,15 @@ import { useState } from "react";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { ToastContainer, toast } from 'react-toast'
+import { ToastContainer, toast } from 'react-toast';
+import BeatLoader from "react-spinners/ClipLoader";
 import PostApi from './Services/PostApi';
 function Login() {
     const [status, setstatus] = useState(false);
     const [flag, setflag] = useState(true);
     const [otp, setOtp] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [loading, setLoading] = useState(false);
     let navigate = useNavigate();
 
     // TODO: Add SDKs for Firebase products that you want to use
@@ -39,9 +41,9 @@ function Login() {
             'callback': (response) => { }
         }, auth);
     }
-    let loader = false;
+
     const requestOtp = async () => {
-        loader = true;
+        setLoading(true);
         if (flag) {
             recaptchaVerifier();
             setflag(false);
@@ -55,28 +57,28 @@ function Login() {
                     // user in with confirmationResult.confirm(code).
                     window.confirmationResult = confirmationResult;
                     setstatus(true);
-                    loader = false;
+                    setLoading(false);
                 }).catch((error) => {
-                    loader = false;
+                    setLoading(false);
                     toast.error(error.message ? error.message : 'Something went wrong. Please try again!!');
-                    // Error; SMS not sent
-                    // ...
                 })
             : toast.error("Please enter a valid phone number");
     }
 
     const verifyOTP = () => {
-        otp.length === 6 ?
-            window.confirmationResult.confirm(otp).then((result) => {               
+        setLoading(true);
+        if (otp.length === 6) {
+            window.confirmationResult.confirm(otp).then((result) => {
                 sessionStorage.setItem('login', true);
                 let tableData = { "list_key": "Mastertable", "label": "auto_customer", "select": "*", "condition": { "status": 1, "auto_customer_phone": phoneNumber } }
-                PostApi('services.php', tableData).then((e) => {                  
+                PostApi('services.php', tableData).then((e) => {
                     sessionStorage.setItem('user', JSON.stringify(e.responcePostData.data.result));
                     !e.responcePostData.data.result.length ?
                         PostApi('services.php', { "list_key": "AddMaster", "label": "auto_customer", "tablefields": { "auto_customer_phone": phoneNumber } }).then((e) => {
                             PostApi('services.php', tableData).then((e) => {
                                 sessionStorage.setItem('user', JSON.stringify(e.responcePostData.data.result));
                                 navigate('/cars');
+                                setLoading(true);
                             })
                         }) : navigate('/cars');
                 })
@@ -84,7 +86,10 @@ function Login() {
             }).catch((error) => {
                 toast.error(error.message ? error.message : 'Something went wrong. Please try again!!');
             })
-            : toast.error("Please enter a valid OTP");
+        } else {
+            toast.error("Please enter a valid OTP");
+            setLoading(false);
+        }
     }
 
     return <div className="h-screen overflow-hidden bg-white rounded-lg shadow-lg ">
@@ -101,8 +106,8 @@ function Login() {
                         <span className="inline-flex items-center px-3  border border-r-0 text-black border-gray-300 bg-gray-50 text-gray-500 text-sm"> +91 </span>
                         <input type="number" name='mobilenumber' onChange={(e) => setPhoneNumber(e.target.value)} onWheel={(e) => e.target.blur()} className="flex-1 block w-full sm:text-sm text-black border-gray-300 " placeholder='9876543210' />
                     </div>
-                    <button type="button" disabled={loader} onClick={(e) => { requestOtp() }} className="p-4 my-2 w-full bg-blue-600  text-white  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-blue-700 hover:shadow-lg  focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out">
-                        Request OTP
+                    <button type="button" disabled={loading} onClick={(e) => { requestOtp() }} className="p-4 my-2 w-full bg-blue-600  text-white  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-blue-700 hover:shadow-lg  focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out">
+                        {!loading ? 'Request OTP' : <BeatLoader size={10} color="#ffffff" />}
                     </button>
                 </div>
                 :
@@ -111,11 +116,11 @@ function Login() {
                     <input type="number" name="otp" onChange={(e) => setOtp(e.target.value)} onWheel={(e) => e.target.blur()} className="mt-1 h-12 shadow-sm px-3 rounded-sm text-slate-600 sm:text-sm border border-slate-300 hover:border-slate-500 outline-none w-full " />
                     <p className='text-xs text-black text-center mt-2'>Dont receivethe OTP? <b onClick={() => requestOtp()}> RESEND OTP</b> </p>
                     <div className='flex flex-row justify-between items-start gap-2'>
-                        <button type="button" onClick={() => setstatus(false)} className="p-4 my-2 w-full text-black border border-red-600  text-red  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-red-700 hover:shadow-lg  focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-red-800 active:shadow-lg  transition  duration-150  ease-in-out">
+                        <button type="button" onClick={() => { setstatus(false); }} className="p-4 my-2 w-full text-black border border-red-600  text-red  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-red-700 hover:shadow-lg  focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-red-800 active:shadow-lg  transition  duration-150  ease-in-out">
                             Cancel
                         </button>
                         <button type="button" onClick={() => verifyOTP()} className="p-4 my-2 w-full border  bg-blue-600  text-white  font-medium  text-xs  leading-tight  uppercase  shadow-md  hover:bg-blue-700 hover:shadow-lg  focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out">
-                            Verify
+                            {!loading ? 'Verify' : <BeatLoader size={10} color="#ffffff" />}
                         </button>
                     </div>
                 </div>

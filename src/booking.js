@@ -18,9 +18,11 @@ import 'filepond/dist/filepond.min.css'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import FilePondPluginFileRename from 'filepond-plugin-file-rename';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+import { BeatLoader } from 'react-spinners';
 // Register the plugins
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileRename)
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileRename,FilePondPluginFileValidateType)
 
 function Booking() {
   const [modal, setModal] = useState(false);
@@ -29,6 +31,7 @@ function Booking() {
   const [selectedCarImage, setselectedCarImage] = useState([]);
   const [carsList, setcarsList] = useState([]);
   const [bookingList, setBookingList] = useState([]);
+  const [loading, setLoading] = useState(false);
   var files = [];
   const [filesDetails, setFilesDetails] = useState([])
   let productData = { "list_key": "Mastertable", "label": "auto_product", "select": "*", "condition": { "status": 1 } }
@@ -48,6 +51,7 @@ function Booking() {
   }
 
   const startRide = () => {
+    setLoading(true);
     let rideData = {
       "list_key": "AddMaster", "label": "auto_ride", "tablefields": {
         'auto_booking_id': selectedCar.id,
@@ -66,12 +70,14 @@ function Booking() {
         "condition": { "id": selectedCar.id }
       }
       PostApi('services.php', customerList).then((e) => {
+        setLoading(false);
         window.location.reload(false);
       });
     });
   }
 
   const cancelBooking = (item) => {
+    setLoading(true);
     let customerList = {
       "list_key": "UpdateMaster", "label": "auto_booking", "update_coloum": { 'status': 2 },
       "condition": { "id": item.id }
@@ -79,11 +85,15 @@ function Booking() {
 
     PostApi('services.php', customerList).then((e) => {
       toast.success('Booking canceled successfully');
-      PostApi('services.php', bookingData).then((e) => { setBookingList(e.responcePostData.data.result); })
+      PostApi('services.php', bookingData).then((e) => { 
+        setBookingList(e.responcePostData.data.result);
+        setLoading(false);
+       })
     });
   }
 
   const viewImage = (item) => {
+    setLoading(false);
     setimageModal(true);
     setselectedCar(item);
     let rideData = { "list_key": "Mastertable", "label": "auto_ride", "select": "*", "condition": { "auto_booking_id": item.id, "auto_cust_code": JSON.parse(sessionStorage.getItem('user'))[0].id } }
@@ -129,7 +139,7 @@ function Booking() {
                     Ride Now
                   </button>
                   <button onClick={() => { cancelBooking(item); }} type="button" className="px-6 mb-2 py-2.5 border-2 border-red-600 bg-white text-black font-medium text-xs leading-tight uppercase shadow-md    focus:outline-none focus:ring-0 transition  duration-150  ease-in-out rounded-sm">
-                    Cancel Booking
+                    { !loading ? 'Cancel Booking' :  <BeatLoader size={10} color="#000000" />}
                   </button>
                 </>
                   : item.status === '2' ?
@@ -137,7 +147,7 @@ function Booking() {
                     item.status === '3' ?
                       <>
                         <button onClick={() => viewImage(item)} type="button" className="px-6 mb-2 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase shadow-md    focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0  active:bg-blue-800 active:shadow-lg  transition  duration-150  ease-in-out rounded-sm">
-                          View Image
+                        { !loading ? 'View Image' :  <BeatLoader size={10} color="#ffffff" />} 
                         </button>
                       </> : ''}
               </div>
@@ -162,6 +172,7 @@ function Booking() {
                         id="files"
                         fileRenameFunction={(file) => { return `${new Date().getTime()}${Math.floor(Math.random() * 1000000000)}${file.extension}` }}
                         value={filesDetails}
+                        acceptedFileTypes={['image/*']}
                         allowMultiple={true}
                         maxFiles={10}
                         onupdatefiles={setFilesDetails}
@@ -183,7 +194,10 @@ function Booking() {
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onClick={() => startRide()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Start Ride</button>
+                <button type="button" onClick={() => startRide()} 
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2
+                 bg-green-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 
+                 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">{ !loading ? 'Start Ride' : <BeatLoader  size={10} color="#ffffff"/>}</button>
                 <button type="button" onClick={() => {
                   setModal(false);
                   files = [];
